@@ -20,3 +20,4 @@ profile.properties
 .externalToolBuilders
 
 .DS_Store
+.env

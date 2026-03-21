@@ -373,29 +373,9 @@ public class Main {
 	 */
 	private static void initializeSecurityManager() {
 		try {
-			// initialize security policy used by the default security manager
-			// because default the security policy is very restrictive (e.g. no
-			// FilePermission)
-			Policy.setPolicy(new Policy() {
-
-				@Override
-				public boolean implies(ProtectionDomain domain, Permission permission) {
-					// all permissions
-					return true;
-				}
-
-				@Override
-				public PermissionCollection getPermissions(CodeSource codesource) {
-					// VisualVM can't connect if this method does return
-					// a checked immutable PermissionCollection
-					return new Permissions();
-				}
-			});
-
-			// set default security manager
-			System.setSecurityManager(new SecurityManager());
+			// The Security Manager is deprecated and will be removed in a future release
+			// We no longer attempt to set it if running on newer JDKs.
 		} catch (Exception e) {
-			// security manager was probably set via system property
 			debug.log(Level.WARNING, e, e::getMessage);
 		}
 	}
