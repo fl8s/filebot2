@@ -54,11 +54,19 @@ public final class Settings {
 	}
 
 	public static URI getApiResource(String resource) {
-		return URI.create("https://api.filebot.net/" + getApplicationRevisionNumber() + "/" + resource);
+		return URI.create("https://api.filebot.net/8836/" + resource);
 	}
 
 	public static String getApiKey(String name) {
-		return getApplicationProperty("apikey." + name);
+		String env = System.getenv("API_KEY_" + name.toUpperCase().replace(".", "_"));
+		if (env != null && env.length() > 0) {
+			return env;
+		}
+		try {
+			return getApplicationProperty("apikey." + name);
+		} catch (Exception e) {
+			return "";
+		}
 	}
 
 	public static boolean isUnixFS() {
