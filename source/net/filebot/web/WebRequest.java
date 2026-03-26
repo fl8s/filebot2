@@ -1,5 +1,7 @@
 package net.filebot.web;
 
+import javax.xml.XMLConstants;
+
 import static java.nio.charset.StandardCharsets.*;
 import static net.filebot.Logging.*;
 import static net.filebot.util.FileUtilities.*;
@@ -93,7 +95,10 @@ public final class WebRequest {
 
 	public static Document getDocument(String xml) throws Exception {
 		if (xml.isEmpty()) {
-			return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			return factory.newDocumentBuilder().newDocument();
 		}
 
 		return getDocument(new InputSource(new StringReader(xml)));
@@ -101,6 +106,8 @@ public final class WebRequest {
 
 	public static Document getDocument(InputSource source) throws Exception {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
 		factory.setValidating(false);
 		factory.setFeature("http://xml.org/sax/features/namespaces", false);
 		factory.setFeature("http://xml.org/sax/features/validation", false);
@@ -295,7 +302,10 @@ public final class WebRequest {
 	}
 
 	public static String getXmlString(Document dom, boolean indent) throws TransformerException {
-		Transformer tr = TransformerFactory.newInstance().newTransformer();
+		TransformerFactory factory = TransformerFactory.newInstance();
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+		Transformer tr = factory.newTransformer();
 		tr.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		tr.setOutputProperty(OutputKeys.INDENT, indent ? "yes" : "no");
 
@@ -310,6 +320,7 @@ public final class WebRequest {
 			return;
 
 		SAXParserFactory sax = SAXParserFactory.newInstance();
+		sax.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 		sax.setValidating(false);
 		sax.setNamespaceAware(false);
 
