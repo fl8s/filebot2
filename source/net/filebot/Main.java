@@ -397,7 +397,7 @@ public class Main {
 		// set additional user-defined default system properties
 		File userDefinedSystemProperties = ApplicationFolder.AppData.resolve("system.properties");
 		if (userDefinedSystemProperties.isFile()) {
-			try (FileInputStream in = new FileInputStream(userDefinedSystemProperties)) {
+			try (FileInputStream in = new FileInputStream(userDefinedSystemProperties.getCanonicalFile())) {
 				Properties p = new Properties();
 				p.load(in);
 				p.forEach((k, v) -> System.setProperty(k.toString(), v.toString()));

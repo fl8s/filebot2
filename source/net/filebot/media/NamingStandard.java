@@ -99,7 +99,7 @@ public class NamingStandard {
 	}
 
 	private static String first(String... options) {
-		return stream(options).filter(Objects::nonNull).findFirst().get();
+		return stream(options).filter(Objects::nonNull).findFirst().orElse("");
 	}
 
 	public String getMovieFolder() {

@@ -730,7 +730,7 @@ public class CmdlineOperations implements CmdlineInterface {
 		File parent = file.getParentFile();
 		String name = getName(file);
 		String ext = getExtension(file);
-		return IntStream.range(1, 100).mapToObj(i -> new File(parent, name + '.' + i + '.' + ext)).filter(f -> !f.exists()).findFirst().get();
+		return IntStream.range(1, 100).mapToObj(i -> new File(parent, name + '.' + i + '.' + ext)).filter(f -> !f.exists()).findFirst().orElseThrow(() -> new IllegalStateException("Failed to find available indexed name for " + file));
 	}
 
 	@Override
