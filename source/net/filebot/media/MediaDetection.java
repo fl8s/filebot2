@@ -36,6 +36,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -1268,6 +1270,7 @@ public class MediaDetection {
 		}
 
 		// search for id in sibling nfo files
+		List<Callable<SearchResult>> tasks = new ArrayList<>();
 		for (File folder : folders) {
 			if (!folder.exists()) {
 				continue;
@@ -1277,18 +1280,27 @@ public class MediaDetection {
 				String text = readTextFile(nfo);
 
 				for (int imdbid : grepImdbId(text)) {
-					SearchResult series = WebServices.TheTVDB.lookupByIMDbID(imdbid, language);
-					if (series != null) {
-						names.add(series);
-					}
+					tasks.add(() -> WebServices.TheTVDB.lookupByIMDbID(imdbid, language));
 				}
 
 				for (int tvdbid : grepTheTvdbId(text)) {
-					SearchResult series = WebServices.TheTVDB.lookupByID(tvdbid, language);
-					if (series != null) {
-						names.add(series);
-					}
+					tasks.add(() -> WebServices.TheTVDB.lookupByID(tvdbid, language));
 				}
+			}
+		}
+
+		if (tasks.isEmpty()) {
+			return names;
+		}
+
+		for (Future<SearchResult> it : WebServices.requestThreadPool.invokeAll(tasks)) {
+			try {
+				SearchResult series = it.get();
+				if (series != null) {
+					names.add(series);
+				}
+			} catch (Exception e) {
+				debug.warning("Failed to lookup info by id: " + e);
 			}
 		}
 
