@@ -4,6 +4,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
     wget \
+    git \
+    xz-utils \
     ant \
     openjfx \
     libopenjfx-java \
@@ -17,7 +19,7 @@ WORKDIR /src
 COPY . .
 
 RUN chmod +x ./download_deps.sh && ./download_deps.sh
-RUN mkdir -p lib && touch lib/src.excludes lib/jar.includes
+RUN mkdir -p lib dist/lib && touch lib/src.excludes lib/jar.includes
 RUN echo "jfx.path=/usr/share/openjfx/lib" > profile.properties
 RUN ant jar
 
@@ -37,7 +39,6 @@ RUN apt-get update && apt-get install -y \
 
 # Copy the built application and its dependencies
 COPY --from=builder /src/dist/ /app/dist/
-COPY --from=builder /src/data/ /app/data/
 COPY --from=builder /src/filebot.sh /app/filebot.sh
 
 RUN chmod +x /app/filebot.sh
