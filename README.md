@@ -28,6 +28,11 @@ Before building, make sure you download the required `.jar` and native dependenc
 
 To build the executable jar file:
 ```bash
+# Create these necessary files first, or ant jar will fail:
+mkdir -p lib
+touch lib/src.excludes lib/jar.includes
+echo "jfx.path=/usr/share/openjfx/lib" > profile.properties
+
 ant jar
 ```
 

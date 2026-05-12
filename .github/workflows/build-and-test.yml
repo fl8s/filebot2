@@ -24,11 +24,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y ant openjfx libopenjfx-java libmediainfo0v5 libchromaprint-tools libzen0v5
+          echo "jfx.path=/usr/share/openjfx/lib" > profile.properties
 
       - name: Download JAR and Native Dependencies
         run: |
           chmod +x ./download_deps.sh
           ./download_deps.sh
+          mkdir -p lib
+          touch lib/src.excludes lib/jar.includes
 
       - name: Compile FileBot
         run: ant jar
@@ -47,6 +50,17 @@ jobs:
         run: |
           chmod +x ./test_e2e.sh
           ./test_e2e.sh
+
+      - name: Upload Docker Image Artifact
+        run: docker save filebot | gzip > filebot-docker.tar.gz
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: filebot-artifacts
+          path: |
+            dist/
+            filebot-docker.tar.gz
 
   release:
     needs: build-and-test
