@@ -153,7 +153,7 @@ public class FFProbe implements MediaCharacteristics {
 	}
 
 	protected Integer getInteger(String streamKind, String property) {
-		return find(streamKind, property).map(Integer::parseInt).get();
+		return find(streamKind, property).map(Integer::parseInt).orElse(0);
 	}
 
 	protected Optional<String> find(String streamKind, String property) {

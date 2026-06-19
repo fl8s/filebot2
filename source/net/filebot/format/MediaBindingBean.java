@@ -359,7 +359,7 @@ public class MediaBindingBean {
 		String extensions = getMediaInfo(StreamKind.General, 0, "Codec/Extensions", "Format");
 
 		// get first extension
-		return tokenize(extensions).map(String::toLowerCase).findFirst().get();
+		return tokenize(extensions).map(String::toLowerCase).findFirst().orElse("");
 	}
 
 	@Define("vf")
@@ -388,10 +388,10 @@ public class MediaBindingBean {
 		int ch = getMediaInfo(StreamKind.Audio, "Channel(s)_Original", "Channel(s)").map(channels -> {
 			// e.g. 15 objects / 6 channels
 			return tokenize(channels, SLASH).map(s -> matchInteger(s)).filter(Objects::nonNull).min(Integer::compare).orElse(null);
-		}).filter(Objects::nonNull).findFirst().get();
+		}).filter(Objects::nonNull).findFirst().orElse(0);
 
 		// get first number, e.g. 6ch
-		return ch + "ch";
+		return ch > 0 ? ch + "ch" : "";
 	}
 
 	@Define("channels")
@@ -405,9 +405,9 @@ public class MediaBindingBean {
 					return 0;
 				}
 			}).max().orElse(0);
-		}).filter(i -> i > 0).findFirst().get();
+		}).filter(i -> i > 0).findFirst().orElse(0.0);
 
-		return BigDecimal.valueOf(d).setScale(1, RoundingMode.HALF_UP).toPlainString();
+		return d > 0 ? BigDecimal.valueOf(d).setScale(1, RoundingMode.HALF_UP).toPlainString() : "";
 	}
 
 	@Define("aco")
